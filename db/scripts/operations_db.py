@@ -18,14 +18,36 @@ conn = psycopg2.connect(
 def register_user(login, password, name, info):
     try:
         cur = conn.cursor()
-        cur.execute("""
-            INSERT INTO users (login, password, name, business_about)
+        cur.execute(
+            """INSERT INTO users (login, password, name, business_about)
             VALUES (%s, %s, %s, %s)
         """, (login, password, name, info))
         conn.commit()
     except Exception as e:
-        print(e)
         conn.rollback()
+        return e
+
 
     return 0
+
+
+def save_vectors(chunks, vectors, category):
+    try:
+        batch = []
+        for i in range(len(chunks)):
+            batch.append((chunks[i], vectors[i], category))
+
+        cur = conn.cursor()
+        cur.executemany(
+            """INSERT INTO chunks (text, embedding, category) 
+                VALUES (%s,%s,%s)
+            """, batch
+        )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    return 0
+
 
