@@ -1,8 +1,10 @@
 from sentence_transformers import SentenceTransformer
-from db.scripts.operations_db import save_vectors
+from db.scripts.operations_db import save_vectors, comparing_embeddings
 import numpy as np
 
+print(6)
 model = SentenceTransformer('sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2')
+print(7)
 
 
 def embed(chunks):
@@ -32,8 +34,11 @@ def chunking(sentences, breakpoints):
 
     return chunks
 
-def retrieve_context():
-    pass
+def retrieve_context(user_request):
+    request_embedding = embed(user_request)
+    categories = comparing_embeddings(request_embedding)
+
+    return categories
 
 
 text = """1. Российская Федерация — светское государство. Никакая религия не может устанавливаться в качестве государственной или обязательной.

@@ -21,8 +21,7 @@ CREATE TABLE chunks (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     text TEXT,
     embedding VECTOR(384),
-    category VARCHAR(50),
-    metadata JSONB
+    category VARCHAR(50)
 );
 
 CREATE TABLE vacancies (

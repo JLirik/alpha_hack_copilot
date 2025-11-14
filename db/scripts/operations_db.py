@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import psycopg2
 import psycopg2.errors
 
+from ml_learning.retriever import category
 
 load_dotenv()
 
@@ -50,4 +51,17 @@ def save_vectors(chunks, vectors, category):
 
     return 0
 
+def comparing_embeddings(embedding):
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """SELECT * FROM chunks ORDER BY embedding <-> %s LIMIT 5;
+            """, embedding
+        )
 
+        result = cur.fetchall()
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    return result
