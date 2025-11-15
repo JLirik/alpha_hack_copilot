@@ -11,6 +11,10 @@ def embed(chunks):
 
 def retrieve_context(user_request):
     request_embedding = embed(user_request)
-    categories = comparing_embeddings(request_embedding)
+    retrieve = comparing_embeddings(request_embedding)
+    categories = {'юриспруденция': 0, 'маркетинг': 0, 'финансы': 0, 'найм': 0}
+    for e in retrieve:
+        categories[e[0]] += e[1]
+    category = max(categories, key=lambda x: categories[x])
 
-    return categories
+    return category

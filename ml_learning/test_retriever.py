@@ -26,11 +26,4 @@ user_requests_1 = [
 ]
 
 for req in user_requests:
-    retrieve = retrieve_context(req)
-    categories = {'юриспруденция': 0, 'маркетинг': 0, 'финансы': 0, 'найм': 0}
-    for e in retrieve:
-        categories[e[0]] += e[1]
-    print(req)
-    for e in sorted(categories.keys(), key=lambda x: categories[x]):
-        print(f'{e}: {categories[e]}')
-    print()
+    print(req, retrieve_context(req))
