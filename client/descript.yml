@@ -1,0 +1,620 @@
+openapi: 3.1.0
+info:
+  title: Alpha Hackathon API
+  version: 1.0.0
+  summary: API для фронтенд-бэкенд взаимодействия для хакатона Альфа-банка
+  description: >
+    Описание API выполнено с использованием стандарта OpenAPI. Существуют способы преобразования YAML-файла в код API для нужного языка, поэтому рекомендую попробовать этот вариант.
+tags:
+  - name: Маркетинг
+    description: Здесь обрабатываются все запросы, связанные с маркетингом
+  - name: Юриспруденция
+    description: Здесь обрабатываются все юридические запросы
+  - name: Найм
+    description: Здесь обрабатываются все запросы по найму
+  - name: Финансы
+    description: Здесь обрабатываются все финансовые запросы
+  - name: Общие
+    description: Здесь обрабатываются запросы, которые нельзя отнести к конкретной категории
+  - name: Аутентификация
+    description: Здесь обрабатываются запросы для регистрации и аутентификации
+  - name: Настройки
+    description: Здесь обрабатываются запросы, связанные с настройками
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: >
+        Используется JWT-токен, полученный в `/api/v1/auth`, который передается в заголовке `Authorization`:
+        `Authorization: Bearer <token>`
+
+  schemas:
+    ErrorResponse:
+      type: object
+      description: Стандартный формат ответа с ошибкой
+      properties:
+        error:
+          type: string
+          examples: ["Возникла ошибка при обработке запроса"]
+        code:
+          type: integer
+          examples: [400]
+        requestId:
+          type: string
+          examples: [""]
+
+    MarketingContentType:
+      type: string
+      description: Тип маркетингового контента для генерации
+      enum: [outodoor_ad, social_media, online_ad, brochure, email]
+      example: "social_media"
+  
+    AnswerType:
+      type: string
+      description: Сфера, с которой связан ответ
+      enum: [marketing, finance, law, hire, other]
+      example: "law"
+
+    QueryResponse:
+      type: object
+      properties:
+        prompt:
+          type: string
+          description: Промпт, который сгенерировал этот ответ
+          example: "Сгенерируй пост для соцсетей про открытие новой кофейни"
+        answer:
+          type: string
+          description: Сгенерированный моделью ответ
+          example: "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!"
+        answerType:
+          $ref: "#/components/schemas/AnswerType"
+        requestId:
+          type: string
+          description: Уникальный идентификатор запроса. Скорее всего, полностью числовой
+          example: "32563642645726"
+        createdAt:
+          type: string
+          format: date-time
+          description: Время создания ответа. Если его сложно реализовать, можно обойтись без него. Напиши об этом мне
+          example: "2025-11-13T10:42:00Z"
+    
+    SettingsStructure:
+      type: object
+      properties:
+        username:
+          type: string
+          description: Логин пользователя (может быть произвольной уникальной комбинацией)
+          examples: ["new_user"]
+        password:
+          type: string
+          description: Пароли приходят на сервер в уже хэшированном виде, поэтому в исходном виде он нигде не сохраняется
+          examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
+        business:
+          type: string
+          description: Описание бизнеса
+          examples: ["Маленькая франшиза спешалти-кофеен"]
+        city:
+          type: string
+          description: Город работы бизнеса
+          examples: ["Москва"]
+
+
+paths:
+  /api/v1/query/marketing/generate:
+    post:
+      summary: Генерация маркетингового контента
+      tags: [Маркетинг]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                topic:
+                  type: string
+                  description: Описание, которое дал пользователь для темы поста
+                  examples: ["Открытие новой кофейни"]
+                amount:
+                  type: integer
+                  description: Количество вариантов, которые надо сгенерировать
+                  examples: [5]
+                style:
+                  type: string
+                  description: Опциональный параметр про стиль, в котором будет сгенерирован ответ. Может быть пустым, тогда надо использовать обычный системный промпт
+                  examples: ["Официальный", ""]
+                contentType:
+                  $ref: "#/components/schemas/MarketingContentType"
+      responses:
+        '200':
+          description: Контент успешно сгенерирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/marketing/regenerate:
+    post:
+      summary: Перегенерация маркетингового контента
+      description: Сценарий, когда пользователь тыкает на конкретный вариант, чтобы сгенерировать еще
+      tags: [Маркетинг]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                contentId:
+                  type: string
+                  description: id предыдущего варианта, на основе которого надо придумать новые
+                  examples: ["32563642645726"]
+      responses:
+        '200':
+          description: Контент успешно перегенерирован
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/hire/createOffer:
+    post:
+      summary: Генерация предложения о работе
+      description: Любые параметры могут быть пустыми, это надо учитывать в промпте. Если забыл важные категории, пишите
+      tags: [Найм]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  vacancy:
+                    type: string
+                    description: Название вакансии
+                    examples: ["Бухгалтер"]
+                  maxSalary:
+                    type: integer
+                    description: Верхняя граница зарплаты для сотрудника в месяц в рублях
+                    examples: [90000]
+                  minSalary:
+                    type: integer
+                    description: Нижняя граница зарплаты для сотрудника в месяц в рублях
+                    examples: [50000]
+                  responsibilities:
+                    type: string
+                    description: Описание обязанностей сотрудника
+                    examples: ["Составление квартальных отчетов, формирование рабочей статистики"]
+      responses:
+        '200':
+          description: Предложение о работе успешно создано
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Некорректные данные предложения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+                
+  /api/v1/query/hire/postOffer:
+    post:
+      summary: Публикация вакансии
+      description: Публикуется черновик вакансии на hh.ru через их API. На вход дается описание вакансии, сгенерированное предыдущим методом
+      tags: [Найм]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                  vacancy:
+                    type: string
+                    description: Название вакансии
+                    examples: ["Бухгалтер"]
+                  maxSalary:
+                    type: integer
+                    description: Верхняя граница зарплаты для сотрудника в месяц в рублях
+                    examples: [90000]
+                  minSalary:
+                    type: integer
+                    description: Нижняя граница зарплаты для сотрудника в месяц в рублях
+                    examples: [50000]
+                  description:
+                    type: string
+                    description: Описание вакансии, сгенерированное LLM
+                    examples: ["Составление квартальных отчетов, формирование рабочей статистики"]
+                  area:
+                    type: string
+                    description: Место трудоустройства
+                    examples: ["Москва"]
+      responses:
+        '200':
+          description: Черновик успешно сохранен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Некорректный запрос
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/hire:
+    post:
+      summary: Обработка вопроса по найму
+      tags: [Найм]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  examples: ["Нужно ли мне нанимать еще сотрудников?"]
+      responses:
+        '200':
+          description: Финансовый запрос успешно выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/law/parse:
+    post:
+      summary: Разбор юридического документа
+      tags: [Юриспруденция]
+      security:
+        - BearerAuth: []
+      description: >
+        Загрузка юридического документа (PDF, DOC или DOCX) для извлечения его текста.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [file]
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: Файл документа для разбора (PDF, DOC или DOCX)
+      responses:
+        '200':
+          description: Документ успешно обработан
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Некорректный или отсутствующий файл
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/law/explain:
+    post:
+      summary: Объяснение юридического пункта или текста
+      tags: [Юриспруденция]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clause:
+                  type: string
+                  examples: ["Настоящее согласие на обработку персональных данных действует с момента его представления оператору на период действия спортивного разряда."]
+                documentId:
+                  type: string
+                  description: id запроса с документом, из которого взят отрывок
+                  examples: ["32563642645726"]
+      responses:
+        '200':
+          description: Запрос успешно выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/finance:
+    post:
+      summary: Обработка финансового вопроса
+      description: Желательно реализовать еще какую-то математическую проверку корректности, если будет возможность
+      tags: [Финансы]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  examples: ["Какова прогнозируемая ключевая ставка за Q4?"]
+      responses:
+        '200':
+          description: Финансовый запрос успешно выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/query/general:
+    post:
+      summary: Обработка общего запроса
+      tags: [Общие]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+                  examples: ["Сколько будет 2+2?"]
+      responses:
+        '200':
+          description: Общий запрос успешно выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/auth:
+    post:
+      summary: Аутентификация пользователя
+      tags: [Аутентификация]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  examples: ["john_doe"]
+                password:
+                  type: string
+                  examples: ["securepassword123"]
+      responses:
+        '200':
+          description: Аутентификация успешна
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refreshToken:
+                    type: string
+                    examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
+        '401':
+          description: Неверный пароль
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Пользователя с таким логином не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/refresh:
+    post:
+      summary: Обновление JWT-токена
+      tags: [Аутентификация]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  examples: ["john_doe"]
+                refreshToken:
+                  type: string
+                  examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
+      responses:
+        '200':
+          description: Обновление успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  accessToken:
+                    type: string
+                    examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
+        '401':
+          description: Неверный токен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Пользователя с таким логином не существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/reg:
+    post:
+      summary: Регистрация нового пользователя
+      tags: [Аутентификация]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsStructure'
+      responses:
+        '200':
+          description: Регистрация прошла успешно
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  refreshToken:
+                    type: string
+                    examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
+        '400':
+          description: Некорректные данные для регистрации
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Пользователь с таким логином уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  
+  /api/v1/settings:
+    get:
+      summary: Получение настроек пользователя
+      description: Информация о пользователе шифруется в JWT-ключе, поэтому дополнительно ее передавать не надо
+      tags: [Настройки]
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Запрос успешно выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsStructure'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      summary: Обновление настроек пользователя
+      tags: [Настройки]
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SettingsStructure'
+      responses:
+        '200':
+          description: Настройки пользователя успешно обновлены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SettingsStructure'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /api/v1/history/{amount}:
+    get:
+      summary: Получение истории запросов пользователя
+      description: Информация о пользователе шифруется в JWT-ключе, поэтому дополнительно ее передавать не надо
+      tags: [Настройки]
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: amount
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+          description: Количество последних запросов, которые надо передать
+      responses:
+        '200':
+          description: Запрос успешно выполнен
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/QueryResponse'
+        '400':
+          description: Запрос не выполнен
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
