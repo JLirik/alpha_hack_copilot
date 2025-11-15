@@ -10,7 +10,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE requests_story (
-    id SERIAL PRIMARY KEY,
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     prompt_in TEXT NOT NULL,
     answer_out TEXT NOT NULL,
