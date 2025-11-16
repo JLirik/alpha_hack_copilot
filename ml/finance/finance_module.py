@@ -14,7 +14,6 @@ def calculate_problem(user_prompt):
 
 
 def explain_solution(problem, solution):
-    print('solution:', solution)
     if '{' in solution:
         prompt = str(open('prompts/explanation_prompt.txt', encoding="utf-8").read())
         prompt = prompt.replace('problem', problem).replace('solution', solution)
