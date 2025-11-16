@@ -1,5 +1,5 @@
 import multiprocessing as mp
-from ml import *
+from hiring_module import *
 
 
 if __name__ == '__main__':
