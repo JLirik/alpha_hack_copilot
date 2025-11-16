@@ -24,6 +24,14 @@ CREATE TABLE chunks (
     category VARCHAR(50)
 );
 
+CREATE TABLE law_base (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    law_name VARCHAR,
+    text TEXT,
+    code VARCHAR,
+    embedding VECTOR(384)
+);
+
 CREATE TABLE vacancies (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,

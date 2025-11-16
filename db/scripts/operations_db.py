@@ -103,7 +103,7 @@ def comparing_embeddings(embedding):
     try:
         cur = conn.cursor()
         cur.execute(f"""
-            SELECT category, embedding <=> '{embedding}' FROM chunks ORDER BY embedding <=> '{embedding}' LIMIT 5;
+            SELECT category, embedding <=> '{embedding}' FROM chunks ORDER BY embedding <=> '{embedding}' ASC LIMIT 5;
             """)
 
         result = cur.fetchall()
@@ -141,3 +141,37 @@ def get_request(uuid):
         return result
     except Exception as e:
         return e
+
+
+def fill_law_base(law_names, texts, embeddings, code):
+    try:
+        batch = []
+        for i in range(len(law_names)):
+            batch.append((law_names[i], texts[i], embeddings[i], code))
+
+        cur = conn.cursor()
+        cur.executemany(
+            """INSERT INTO law_base (law_name, text, embedding, code) 
+                VALUES (%s,%s,%s,%s)
+            """, batch
+        )
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    return 0
+
+def find_law(embedding):
+    try:
+        cur = conn.cursor()
+        cur.execute(f"""
+            SELECT law_name, code, text FROM law_base ORDER BY embedding <=> '{embedding}' ASC LIMIT 5;
+            """)
+
+        result = cur.fetchall()
+    except Exception as e:
+        conn.rollback()
+        return e
+
+    return result
