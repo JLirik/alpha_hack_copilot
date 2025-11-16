@@ -2,7 +2,7 @@ import logging
 import time
 import uuid
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -16,11 +16,13 @@ from .utils.validation import validate_json_request, validate_file_request
 from .utils.handlers import handle_logic_request
 from .models.requests import *
 from .models.responses import APIResponse
+from .services.authentication_service import AuthenticationService
 from .services.finance_service import FinanceService
 from .services.general_service import GeneralService
 from .services.hire_service import HireService
 from .services.jurisdiction_service import JurisdictionService
 from .services.marketing_service import MarketingService
+from .services.settings_service import SettingsService
 
 
 @app.before_request
@@ -33,6 +35,7 @@ def before_request():
         "request_id": request.request_id,
         "method": request.method,
         "path": request.path,
+        "endpoint": request.endpoint,
         "user_agent": request.headers.get('User-Agent'),
         "ip": request.remote_addr
     })
@@ -145,6 +148,86 @@ def process_general_question():
     return handle_logic_request(GeneralService.process_question, query, "Processing general question")
 
 
+@app.route(f'{app.config["API_PREFIX"]}/auth', methods=['POST'])
+def auth():
+    """Аутентификация пользователя"""
+
+    validation_error, query = validate_json_request(AuthRequest)
+    if validation_error:
+        return validation_error
+    try:
+        return AuthenticationService.auth(query)
+    except Exception as e:
+        logger.error(f"Authentication failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during authentication", request.request_id)
+
+
+@app.route(f'{app.config["API_PREFIX"]}/refresh', methods=['POST'])
+def refresh():
+    """Обновление JWT-токена"""
+
+    validation_error, query = validate_json_request(RefreshRequest)
+    if validation_error:
+        return validation_error
+    try:
+        return AuthenticationService.refresh(query)
+    except Exception as e:
+        logger.error(f"Refresh failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during refresh", request.request_id)
+
+
+@app.route(f'{app.config["API_PREFIX"]}/reg', methods=['POST'])
+def reg():
+    """Регистрация нового пользователя"""
+
+    validation_error, query = validate_json_request(RegRequest)
+    if validation_error:
+        return validation_error
+    try:
+        return AuthenticationService.reg(query)
+    except Exception as e:
+        logger.error(f"Reg failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during reg", request.request_id)
+
+
+@app.route(f'{app.config["API_PREFIX"]}/settings', methods=['GET'])
+def get_settings():
+    """Получение настроек пользователя"""
+
+    try:
+        return SettingsService.get_settings(), 200
+    except Exception as e:
+        logger.error(f"Getting settings failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during getting settings", request.request_id)
+
+
+@app.route(f'{app.config["API_PREFIX"]}/settings', methods=['PATCH'])
+def update_settings():
+    """Обновление настроек пользователя"""
+
+    validation_error, query = validate_json_request(UpdateSettingsRequest)
+    if validation_error:
+        return validation_error
+    try:
+        return SettingsService.update_settings(query), 200
+    except Exception as e:
+        logger.error(f"Update settings failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during update settings", request.request_id)
+
+
+@app.route(f'{app.config["API_PREFIX"]}/history/<int:amount>', methods=['GET'])
+def history(amount):
+    """Получение истории запросов пользователя"""
+
+    if amount < 1:
+        return APIResponse.error("Amount must be >= 1", request.request_id)
+    try:
+        return jsonify(SettingsService.get_history(amount, request.request_id)), 200
+    except Exception as e:
+        logger.error(f"Getting history failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during getting history", request.request_id)
+
+
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/generate', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/regenerate', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/law/parse', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
@@ -154,6 +237,11 @@ def process_general_question():
 @app.route(f'{app.config["API_PREFIX"]}/query/hire', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/finance', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/general', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+@app.route(f'{app.config["API_PREFIX"]}/auth', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+@app.route(f'{app.config["API_PREFIX"]}/refresh', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+@app.route(f'{app.config["API_PREFIX"]}/reg', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+@app.route(f'{app.config["API_PREFIX"]}/settings', methods=['POST', 'PUT', 'DELETE'])
+@app.route(f'{app.config["API_PREFIX"]}/history/<int:amount>', methods=['POST', 'PUT', 'DELETE', 'PATCH'])
 def method_not_allowed():
     """Обработчик неподдерживаемых методов"""
 

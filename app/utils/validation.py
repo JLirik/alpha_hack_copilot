@@ -3,8 +3,9 @@ import os
 
 from flask import current_app as app
 from flask import request
-from ..models.responses import APIResponse
 from pydantic import ValidationError
+
+from ..models.responses import APIResponse
 
 logger = logging.getLogger(__name__)
 

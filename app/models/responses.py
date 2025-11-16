@@ -15,9 +15,9 @@ class APIResponse:
         } | addition, 200
 
     @staticmethod
-    def error(error: str, request_id: str = ""):
+    def error(error: str, request_id: str = "", code: int = 400):
         return {
             "error": error,
-            "code": 400,
+            "code": code,
             "request_id": request_id
-        }, 400
+        }, code
