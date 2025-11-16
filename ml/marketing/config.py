@@ -1,0 +1,1 @@
+GENERATION_MODEL = 'deepseek-r1:8b'
