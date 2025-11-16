@@ -103,7 +103,7 @@ def comparing_embeddings(embedding):
     try:
         cur = conn.cursor()
         cur.execute(f"""
-            SELECT category, embedding <=> '{embedding}' FROM chunks ORDER BY embedding <=> '{embedding}' LIMIT 5;
+            SELECT category, embedding <=> '{embedding}' FROM chunks ORDER BY embedding <=> '{embedding}' ASC LIMIT 5;
             """)
 
         result = cur.fetchall()
