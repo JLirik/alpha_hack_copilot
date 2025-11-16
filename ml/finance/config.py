@@ -1,2 +1,0 @@
-CALCULATION_MODEL = 'qwen3:4b'
-EXPLANATION_MODEL = 'deepseek-r1:8b'
