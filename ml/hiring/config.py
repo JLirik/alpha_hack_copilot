@@ -1,2 +1,0 @@
-INFO_EXTRACTION_MODEL = 'gemma3:4b'
-VACANCY_GENERATION_MODEL = 'deepseek-r1:8b'
