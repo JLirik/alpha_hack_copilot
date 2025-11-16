@@ -5,6 +5,7 @@ CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     login VARCHAR(20) UNIQUE NOT NULL,
     password VARCHAR(20) UNIQUE NOT NULL,
+    city VARCHAR(20) NOT NULL,
     name TEXT NOT NULL,
     business_about TEXT
 );
@@ -30,17 +31,6 @@ CREATE TABLE law_base (
     text TEXT,
     code VARCHAR,
     embedding VECTOR(384)
-);
-
-CREATE TABLE vacancies (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-    responsibilities JSONB NOT NULL,
-    requirements JSONB NOT NULL,
-    conditions TEXT NOT NULL,
-    salary INT NOT NULL,
-    work_type TEXT NULL,
-    contact VARCHAR NOT NULL
 );
 
 CREATE INDEX ON chunks USING hnsw (embedding vector_cosine_ops);
