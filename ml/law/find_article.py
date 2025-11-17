@@ -10,9 +10,7 @@ def embed(chunks):
     return embeddings.tolist()
 
 
-# For Law_base
 def retrieve_law(user_request):
     request_embedding = embed(user_request)
     retrieve = find_law(request_embedding)
-
     return retrieve

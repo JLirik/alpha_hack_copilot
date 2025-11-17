@@ -6,26 +6,28 @@ from ollama import *
 ollama_client = Client()
 
 
-def calculate_problem(user_prompt):
+def calculate_problem(user_prompt, _city, _business_info):
     prompt = str(open('prompts/calculation_prompt.txt', encoding="utf-8").read())
     prompt = prompt.replace('question', user_prompt, 1)
+    prompt = prompt.replace('city', _city).replace('business_info', _business_info)
+    print(prompt)
     response = ollama_client.chat(model=CALCULATION_MODEL, messages=[{'role': 'user', 'content': prompt}])
     return response['message']['content']
 
 
-def explain_solution(problem, solution):
-    if '{' in solution:
-        prompt = str(open('prompts/explanation_prompt.txt', encoding="utf-8").read())
-        prompt = prompt.replace('problem', problem).replace('solution', solution)
-        response = ollama_client.chat(model=EXPLANATION_MODEL, messages=[{'role': 'user', 'content': prompt}])
-        return response['message']['content']
-    else:
-        return solution
+# def explain_solution(problem, solution):
+#     if '{' in solution:
+#         prompt = str(open('prompts/explanation_prompt.txt', encoding="utf-8").read())
+#         prompt = prompt.replace('problem', problem).replace('solution', solution)
+#         response = ollama_client.chat(model=EXPLANATION_MODEL, messages=[{'role': 'user', 'content': prompt}])
+#         return response['message']['content']
+#     else:
+#         return solution
 
 
-def generate(prompt: str) -> str:
-    problem_solution = calculate_problem(prompt)
-    result = explain_solution(prompt, problem_solution)
+def generate(prompt: str, city='Нет данных, игнорируй', business_info='Нет данных, игнорируй') -> str:
+    result = calculate_problem(prompt, city, business_info)
+    # result = explain_solution(prompt, problem_solution)
     return result
 
 

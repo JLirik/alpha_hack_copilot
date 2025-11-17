@@ -4,6 +4,8 @@ import { createRoot } from 'react-dom/client'
 import 'bootstrap/dist/css/bootstrap.css';
 import { BrowserRouter, Route, Routes } from 'react-router'
 import App from './App.jsx'
+import store from './routes/methods/store.js';
+import { Provider } from 'react-redux';
 
 import Login from './routes/Login.jsx'
 import Home from './routes/Home.jsx'
@@ -16,6 +18,7 @@ import Finance from './routes/Finance.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
+
     <BrowserRouter>
       <Routes>
         <Route path='/' element={<App />}>

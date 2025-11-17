@@ -1,6 +1,7 @@
 import { CardGroup, Card } from 'react-bootstrap';
 import { Link } from 'react-router';
-import SearchBar from './SearchBar';
+import SearchBar from './methods/SearchBar';
+import { useState } from 'react';
 
 function Home() {
     const returnAnswer = () => {
@@ -9,6 +10,7 @@ function Home() {
             return <Card><Card.Title>Рассказ</Card.Title><Card.Text>{localStorage.getItem("answer").answer}</Card.Text></Card>;
         }
     }
+    // accessToken, editToken = useState();
     return (
         <>
             <CardGroup>

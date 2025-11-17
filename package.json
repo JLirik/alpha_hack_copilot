@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "msw": "^2.12.2",
+    "openapi-msw": "^2.0.0"
+  }
+}
