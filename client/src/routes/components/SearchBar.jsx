@@ -3,17 +3,18 @@ import { useNavigate } from 'react-router';
 import fetcher from '../methods/Fetcher';
 
 
-function SearchBar(apiEndpoint) {
+function SearchBar({ apiEndpoint }) {
   let navigate = useNavigate();
 
   const sendQuery = (formData) => {
     if (!formData.get("question")) return;
     fetcher(apiEndpoint, { "query": formData.get("question") }).catch((e) => navigate("/reg")).then(data => {
-        if (data) {
-          localStorage.setItem("answer", data);
-          navigate(data.answerType != "other" ? "/" + data.answerType : "/");
-        } else localStorage.setItem("answer", "Не получилось сгенерировать ответ");
-      });
+      if (data) {
+        localStorage.setItem("answer", data);
+        console.log(data);
+        navigate(data.answerType != "other" ? "/" + data.answerType : "/");
+      } else localStorage.setItem("answer", "Не получилось сгенерировать ответ");
+    });
   }
 
   return (

@@ -1,13 +1,16 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import { data, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
 import HistoryList from './routes/components/HistoryList';
 import { Form, InputGroup, Button, CardGroup, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
+import fetcher from './routes/methods/Fetcher';
+import { RegistrationError, AuthorizationError } from './routes/components/Errors';
 
 function Footer() {
   const [history, setHistory] = useState(null);
   const [loading, setLoading] = useState(true);
+
 
   let location = useLocation();
   let topic = location.pathname.split('/') ? location.pathname.split('/').at(-1) : "";
@@ -32,16 +35,23 @@ function Footer() {
 
   useEffect(() => {
     const loadHistory = async () => {
-      const result = await fetcher("history/10", {}, "GET");
-      setHistory(result);
-      setLoading(false);
+      try {
+        const result = await fetcher("history/10", {}, "GET");
+        setHistory(result);
+        setLoading(false);
+      } catch (e) {
+        if ((e) == AuthorizationError) {
+          console.log();
+        }
+      }
     }
 
     loadHistory();
   }, []);
+  if (loading) return <p>Загрузка...</p>;
   return (
     <>
-      <HistoryList data={history ? history : {}}/>
+      <HistoryList data={history ? history : {}} />
     </>
   )
 }

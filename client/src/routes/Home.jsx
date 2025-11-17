@@ -5,8 +5,9 @@ import SearchBar from './components/SearchBar';
 function Home() {
     const returnAnswer = () => {
         if (localStorage.getItem("answer")) {
+            const answer = localStorage.getItem("answer").answer
             localStorage.removeItem("answer");
-            return <Card><Card.Text>{localStorage.getItem("answer").answer}</Card.Text></Card>;
+            return <Card><Card.Text>{answer}</Card.Text></Card>;
         }
     }
     return (
@@ -41,7 +42,7 @@ function Home() {
                 </Card>
             </CardGroup >
             {returnAnswer()}
-            <SearchBar apiEndpoint="general"/>
+            <SearchBar apiEndpoint="query/general"/>
         </>
     )
 }

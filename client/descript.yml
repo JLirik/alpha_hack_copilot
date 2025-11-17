@@ -88,9 +88,13 @@ components:
           type: string
           description: Логин пользователя (может быть произвольной уникальной комбинацией)
           examples: ["new_user"]
+        name:
+          type: string
+          description: ФИО пользователя
+          examples: ["Смирнов Александр Антонович"]
         password:
           type: string
-          description: Пароли приходят на сервер в уже хэшированном виде, поэтому в исходном виде он нигде не сохраняется
+          description: Новый пароль, который нужно установить. Пароли приходит на сервер в нехэшированном виде
           examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
         business:
           type: string
@@ -469,22 +473,9 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 
   /api/v1/refresh:
-    post:
+    get:
       summary: Обновление JWT-токена
       tags: [Аутентификация]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                  examples: ["john_doe"]
-                refreshToken:
-                  type: string
-                  examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
       responses:
         '200':
           description: Обновление успешно
@@ -573,6 +564,10 @@ paths:
         content:
           application/json:
             schema:
+              curr_password:
+                type: string
+                description: Старый пароль для подтверждения действия. Пароли приходит на сервер в нехэшированном виде
+                examples: ["eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."]
               $ref: '#/components/schemas/SettingsStructure'
       responses:
         '200':
