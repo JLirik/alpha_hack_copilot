@@ -70,6 +70,7 @@ class RegRequest(BaseModel):
     password: str
     business: str
     city: str
+    name: str
 
 
 class UpdateSettingsRequest(BaseModel):

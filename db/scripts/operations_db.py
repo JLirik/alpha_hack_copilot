@@ -14,7 +14,7 @@ conn = psycopg2.connect(
 )
 
 
-def register_user(login, password, name, info):
+def register_user(login, password, name, city, info):
     try:
         cur = conn.cursor()
 
@@ -25,21 +25,17 @@ def register_user(login, password, name, info):
 
         existing_user = cur.fetchone()
         if existing_user:
-            cur.close()
-
-            return False, "Пользователь с таким логином уже существует"
+            return 409
 
         cur.execute(
-            """INSERT INTO users (login, password, name, business_about)
-            VALUES (%s, %s, %s, %s)
-        """, (login, password, name, info))
+            """INSERT INTO users (login, password, city, name, business_about)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (login, password, name, city, info))
 
         conn.commit()
     except Exception as e:
         conn.rollback()
-        return e
-
-
+        return 400
     return 0
 
 
@@ -48,16 +44,21 @@ def login_user(login, password):
         cur = conn.cursor()
 
         cur.execute(
-            """SELECT id FROM users WHERE login = %s AND password = %s""",
-            (login, password)
+            """SELECT id FROM users WHERE login = %s""",
+            login
         )
 
         existing_user = cur.fetchone()
         if existing_user:
-            cur.close()
+            return 404 # Not exist
 
-            return False, "Неверный логин или пароль"
+        cur.execute(
+            """SELECT id FROM users WHERE login = %s AND password = %s""",
+            (login, password)
+        )
 
+        if not cur.fetchone():
+            return 401 # Wrong password
     except Exception as e:
         conn.rollback()
         return e
@@ -65,18 +66,29 @@ def login_user(login, password):
     return 0
 
 
-def update_user_information(info, uuid):
+def get_user_info(uuid):
     try:
         cur = conn.cursor()
         cur.execute(
-            """UPDATE users SET business_about = %s WHERE id = %s
-        """, (info, uuid))
-        conn.commit()
+            """SELECT city, info FROM users WHERE id = %s
+        """, uuid)
+
+        return cur.fetchone()
     except Exception as e:
         conn.rollback()
         return e
 
 
+def update_user_information(name, info, uuid):
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """UPDATE users SET name = %s, business_about = %s WHERE id = %s
+        """, (name, info, uuid))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        return e
     return 0
 
 

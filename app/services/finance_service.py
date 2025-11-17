@@ -1,13 +1,20 @@
 from ..models.requests import FinanceQuestionQuery
+from ml.finance import finance_module
+from db.scripts.operations_db import get_user_info, insert_request
 
 
 class FinanceService:
     """Сервис для работы с финансовым задачами"""
 
     @staticmethod
-    def process_question(query: FinanceQuestionQuery) -> dict:
+    def process_question(query: FinanceQuestionQuery, user_id) -> dict:
+        city, business_info = get_user_info(user_id)
+        prompt_answer = finance_module.generate(query.query, city, business_info)
+
+        insert_request(user_id, query.query, prompt_answer)
+
         return {
-            "prompt": "Сгенерируй пост для соцсетей про открытие новой кофейни",
-            "answer": "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!",
-            "answerType": "law",
+            "prompt": query.query,
+            "answer": prompt_answer,
+            "answerType": "finance",
         }
