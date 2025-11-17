@@ -1,0 +1,74 @@
+:root {
+  --alpha-red: #ef3124;
+  --alpha-black: #000;
+  --alpha-white: #fff;
+  --gray: #f3f3f3;
+}
+
+/* Основная карточка */
+.post-card {
+  background: var(--alpha-white);
+  padding: 20px;
+  margin: 20px 0;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.08);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+  transition: box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.post-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.15);
+}
+
+/* Альфа header */
+.alpha-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  padding-bottom: 10px;
+  margin-bottom: 14px;
+}
+
+.alpha-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 6px;
+  background: var(--alpha-black);
+  color: var(--alpha-white);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: 800;
+}
+
+.alpha-icon.red {
+  background: var(--alpha-red);
+}
+
+/* MARKETING STYLES */
+
+/* Стандартный красный Альфа */
+.mkt-standard {
+  background: var(--alpha-red);
+  color: var(--alpha-white);
+}
+
+/* Премиальный градиент */
+.mkt-creative {
+  background: linear-gradient(145deg, #ef3124, #b20000);
+  color: var(--alpha-white);
+}
+
+/* Черно-красный фирменный */
+.mkt-insane {
+  background: var(--alpha-black);
+  color: var(--alpha-red);
+  border: 2px solid var(--alpha-red);
+}
+
+/* Markdown */
+.markdown-content p {
+  margin: 10px 0;
+}

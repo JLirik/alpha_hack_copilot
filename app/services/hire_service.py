@@ -1,29 +1,21 @@
-from ..models.requests import HireCreateOfferQuery, HirePostOfferQuery, HireQuestionQuery
+from ..models.requests import HireQuestionQuery
+from db.scripts.operations_db import get_user_info, insert_request
+from ml.hiring import hiring_module
 
 
 class HireService:
     """Сервис для работы с задачами по найму"""
 
     @staticmethod
-    def create_offer(query: HireCreateOfferQuery) -> dict:
-        return {
-            "prompt": "Сгенерируй пост для соцсетей про открытие новой кофейни",
-            "answer": "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!",
-            "answerType": "law",
-        }
+    def process_question(query: HireQuestionQuery, user_id) -> dict:
+        city, business_info = get_user_info(user_id)
+        prompt_answer = hiring_module.generate(query.query, city,
+                                                business_info)
 
-    @staticmethod
-    def post_offer(query: HirePostOfferQuery) -> dict:
-        return {
-            "prompt": "Сгенерируй пост для соцсетей про открытие новой кофейни",
-            "answer": "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!",
-            "answerType": "law",
-        }
+        insert_request(user_id, query.query, prompt_answer, 'hire')
 
-    @staticmethod
-    def process_question(query: HireQuestionQuery) -> dict:
         return {
-            "prompt": "Сгенерируй пост для соцсетей про открытие новой кофейни",
-            "answer": "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!",
-            "answerType": "law",
+            "prompt": query.query,
+            "answer": prompt_answer,
+            "answerType": "hire",
         }

@@ -10,13 +10,16 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.10.1",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
+    "katex": "^0.16.25",
     "msw": "^2.12.2",
     "openapi-msw": "^2.0.0",
     "react": "^19.2.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.0",
+    "react-redux": "^9.2.0",
     "react-router": "^7.9.6"
   },
   "devDependencies": {

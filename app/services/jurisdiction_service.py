@@ -1,21 +1,21 @@
 from ..models.requests import JurisdictionExplainQuery
+from db.scripts.operations_db import get_user_info, insert_request
+from ml.law import law_module
 
 
 class JurisdictionService:
     """Сервис для работы с юридическими задачами"""
 
     @staticmethod
-    def parse_document(file) -> dict:
-        return {
-            "prompt": "Сгенерируй пост для соцсетей про открытие новой кофейни",
-            "answer": "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!",
-            "answerType": "law",
-        }
+    def explain_text(query: JurisdictionExplainQuery, user_id) -> dict:
+        city, business_info = get_user_info(user_id)
+        prompt_answer = law_module.generate(query.query, city,
+                                                business_info)
 
-    @staticmethod
-    def explain_text(query: JurisdictionExplainQuery) -> dict:
+        insert_request(user_id, query.query, prompt_answer, 'law')
+
         return {
-            "prompt": "Сгенерируй пост для соцсетей про открытие новой кофейни",
-            "answer": "Внимание! Уже завтра на главной улице мы откроем лучшую кофейню в городе. Приходите все!",
+            "prompt": query.query,
+            "answer": prompt_answer,
             "answerType": "law",
         }

@@ -1,14 +1,9 @@
-from typing import Optional
-
 from pydantic import BaseModel
 
 
 class MarketingGenerateQuery(BaseModel):
     """Модель запроса для генерации маркетингового контента"""
     topic: str
-    amount: int
-    style: str
-    contentType: str
 
 
 class MarketingRegenerateQuery(BaseModel):
@@ -20,23 +15,6 @@ class JurisdictionExplainQuery(BaseModel):
     """Модель запроса для объяснения юридического пункта или текста"""
     clause: str
     documentId: str
-
-
-class HireCreateOfferQuery(BaseModel):
-    """Модель запроса для генерации предложения о работе"""
-    vacancy: str
-    maxSalary: int
-    minSalary: int
-    responsibilities: str
-
-
-class HirePostOfferQuery(BaseModel):
-    """Модель запроса для публикации вакансии"""
-    vacancy: str
-    maxSalary: int
-    minSalary: int
-    description: str
-    area: str
 
 
 class HireQuestionQuery(BaseModel):
@@ -72,6 +50,7 @@ class RegRequest(BaseModel):
     password: str
     business: str
     city: str
+    name: str
 
 
 class UpdateSettingsRequest(BaseModel):

@@ -27,5 +27,5 @@ user_requests_1 = [
 
 # for req in user_requests:
 #     print(req, retrieve_context(req))
-print(retrieve_context('Что лучше: вложиться в никель или в акции лабубу?'))
+print(retrieve_context('Стоит ли нанимать senior-разработчику с опытом в 1 год?'))
 

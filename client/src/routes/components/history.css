@@ -1,0 +1,55 @@
+.history-container {
+  margin-top: 40px;
+  padding: 20px;
+}
+
+.history-title {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #7a0f16; /* бордовый акцент */
+  margin-bottom: 16px;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.history-item {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  animation: appear 0.25s ease;
+}
+
+.history-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+}
+
+.history-item-time {
+  font-size: 0.8rem;
+  color: #555;
+  margin-bottom: 8px;
+}
+
+.history-item-query {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #000;
+}
+
+.history-item-answer {
+  font-size: 0.95rem;
+  color: #333;
+}
+
+@keyframes appear {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

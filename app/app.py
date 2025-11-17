@@ -83,16 +83,6 @@ def regenerate_marketing_content():
     return handle_logic_request(MarketingService.regenerate_content, query, "Content regeneration")
 
 
-@app.route(f'{app.config["API_PREFIX"]}/query/law/parse', methods=['POST'])
-def parse_legal_document():
-    """Разбор юридического документа"""
-
-    validation_error, file = validate_file_request()
-    if validation_error:
-        return validation_error
-    return handle_logic_request(JurisdictionService.parse_document, file, "Parsing legal document")
-
-
 @app.route(f'{app.config["API_PREFIX"]}/query/law/explain', methods=['POST'])
 def explain_legal_text():
     """Объяснение юридического пункта или текста"""
@@ -101,26 +91,6 @@ def explain_legal_text():
     if validation_error:
         return validation_error
     return handle_logic_request(JurisdictionService.explain_text, query, "Explaining legal text")
-
-
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/createOffer', methods=['POST'])
-def create_offer():
-    """Генерация предложения о работе"""
-
-    validation_error, query = validate_json_request(HireCreateOfferQuery)
-    if validation_error:
-        return validation_error
-    return handle_logic_request(HireService.create_offer, query, "Creating offer")
-
-
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/postOffer', methods=['POST'])
-def post_offer():
-    """Публикация вакансии"""
-
-    validation_error, query = validate_json_request(HirePostOfferQuery)
-    if validation_error:
-        return validation_error
-    return handle_logic_request(HireService.post_offer, query, "Posting offer")
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/hire', methods=['POST'])
@@ -161,7 +131,7 @@ def auth():
     if validation_error:
         return validation_error
     try:
-        return AuthenticationService.auth(query)
+        return AuthenticationService.auth(query, request.request_id)
     except Exception as e:
         logger.error(f"Authentication failed for request {request.request_id}: {str(e)}", exc_info=True)
         return APIResponse.error(f"Internal server error during authentication", request.request_id)
@@ -235,10 +205,7 @@ def history(amount):
 
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/generate', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/regenerate', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
-@app.route(f'{app.config["API_PREFIX"]}/query/law/parse', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/law/explain', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/createOffer', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/postOffer', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/hire', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/finance', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/general', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
