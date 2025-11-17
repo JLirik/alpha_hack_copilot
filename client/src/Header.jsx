@@ -1,5 +1,5 @@
 import './App.css'
-import { Col, Container, Form, Nav, Navbar, NavDropdown, Row, Button } from 'react-bootstrap';
+import { Col, Container, Form, Nav, Navbar, NavDropdown, Row, Button, ToggleButton } from 'react-bootstrap';
 
 function Header({ themeHandle }) {
     const handleChange = (event) => {
@@ -28,42 +28,37 @@ function Header({ themeHandle }) {
         <>
             <Navbar expand="lg" className="bg-body-tertiary">
                 <Container>
-                    <Navbar.Brand href="/">Альфа-Помощь</Navbar.Brand>
+                    <Navbar.Brand href="/">
+                        <img
+                            alt="Логотип Альфа-банка"
+                            src="././image.png"
+                            width="30"
+                            height="30"
+                            className="d-inline-block align-center"
+                        />{' '}
+                        Альфа-Помощь
+                    </Navbar.Brand>
 
-                    <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                    <Navbar.Collapse id="basic-navbar-nav">
-                        <Nav className="me-auto">
-                            <Nav.Link href="#home">Home</Nav.Link>
-                            <Nav.Link href="#link">Link</Nav.Link>
-                            <NavDropdown title="Dropdown" id="basic-nav-dropdown">
-                                <NavDropdown.Item href="#action/3.1">Action</NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.2">
-                                    Another action
-                                </NavDropdown.Item>
-                                <NavDropdown.Item href="#action/3.3">Something</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item href="#action/3.4">
-                                    Separated link
-                                </NavDropdown.Item>
-                            </NavDropdown>
-                        </Nav>
-                        <Form>
-                            <Row>
-                                <Col xs="auto">
-                                    <Button variant="outline-primary" href='/settings'>
-                                        <i className="bi bi-gear"></i>
-                                    </Button>
-                                </Col>
-                                <Col xs="auto">
-                                    <Form.Switch
-                                        id="theme-switch"
-                                        onChange={handleChange}
-                                        checked={localStorage.getItem("theme") == "dark"}
-                                    />
-                                </Col>
-                            </Row>
-                        </Form>
-                    </Navbar.Collapse>
+                    <Form>
+                        <Row>
+                            <Col xs="auto">
+                                <Button variant="outline-danger" href='/settings'>
+                                    <i className="bi bi-gear"></i>
+                                </Button>
+                            </Col>
+                            <Col xs="auto">
+                                <ToggleButton id='toggle-check'
+                                type="checkbox"
+                                variant="outline-danger"
+                                    onChange={handleChange}
+                                    className="d-inline-block align-top"
+                                    checked={localStorage.getItem("theme") == "dark"}
+                                >
+                                    <i className="bi bi-moon"></i>
+                                </ToggleButton>
+                            </Col>
+                        </Row>
+                    </Form>
                 </Container>
             </Navbar>
             <h1>{greeting + last_part}</h1>

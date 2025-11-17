@@ -1,16 +1,15 @@
 import { CardGroup, Card } from 'react-bootstrap';
 import { Link } from 'react-router';
 import SearchBar from './components/SearchBar';
-import { useState } from 'react';
 
 function Home() {
     const returnAnswer = () => {
         if (localStorage.getItem("answer")) {
+            const answer = localStorage.getItem("answer").answer
             localStorage.removeItem("answer");
-            return <Card><Card.Title>Рассказ</Card.Title><Card.Text>{localStorage.getItem("answer").answer}</Card.Text></Card>;
+            return <Card><Card.Text>{answer}</Card.Text></Card>;
         }
     }
-    // accessToken, editToken = useState();
     return (
         <>
             <CardGroup>
@@ -43,7 +42,7 @@ function Home() {
                 </Card>
             </CardGroup >
             {returnAnswer()}
-            <SearchBar apiEndpoint="general"/>
+            <SearchBar apiEndpoint="query/general"/>
         </>
     )
 }

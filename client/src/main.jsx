@@ -18,20 +18,21 @@ import Finance from './routes/Finance.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-
-    <BrowserRouter>
-      <Routes>
-        <Route path='/' element={<App />}>
-          <Route index element={<Home />}></Route>
-          <Route path='settings' element={<Settings />}></Route>
-          <Route path='marketing' element={<Marketing />}></Route>
-          <Route path='hire' element={<Hire />}></Route>
-          <Route path='law' element={<Law />}></Route>
-          <Route path='finance' element={<Finance />}></Route>
-        </Route>
-        <Route path='/login' element={<Login />}></Route>
-        <Route path='/reg' element={<Register />}></Route>
-      </Routes>
-    </BrowserRouter>
-  </StrictMode>,
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+          <Route path='/' element={<App />}>
+            <Route index element={<Home />}></Route>
+            <Route path='settings' element={<Settings />}></Route>
+            <Route path='marketing' element={<Marketing />}></Route>
+            <Route path='hire' element={<Hire />}></Route>
+            <Route path='law' element={<Law />}></Route>
+            <Route path='finance' element={<Finance />}></Route>
+          </Route>
+          <Route path='/login' element={<Login />}></Route>
+          <Route path='/reg' element={<Register />}></Route>
+        </Routes>
+      </BrowserRouter>
+    </Provider>
+  </StrictMode >,
 )

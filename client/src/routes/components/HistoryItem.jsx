@@ -5,7 +5,7 @@ export default function HistoryItem({ item }) {
     const [open, setOpen] = useState(false);
     const contentRef = useRef(null);
     const [height, setHeight] = useState("0px");
-
+    console.log(item);
     useEffect(() => {
         if (open) {
             setHeight(`${contentRef.current.scrollHeight}px`);
@@ -21,11 +21,11 @@ export default function HistoryItem({ item }) {
         >
             <div className="history-header">
                 <div className="history-item-time">
-                    {new Date(item.timestamp).toLocaleString()}
+                    {new Date(item.createdAt).toLocaleDateString()}
                 </div>
 
                 <div className="history-item-query">
-                    {item.query}
+                    {item.prompt}
                 </div>
 
                 <div className={`arrow ${open ? "rotated" : ""}`}>▸</div>

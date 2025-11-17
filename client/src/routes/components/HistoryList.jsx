@@ -1,43 +1,22 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { fetchHistory } from "./historyApi";
+import HistoryItem from "./HistoryItem";
 import "./history.css";
 
-export default function HistoryItem({ item }) {
-    const [open, setOpen] = useState(false);
-    const contentRef = useRef(null);
-    const [height, setHeight] = useState("0px");
-
-    useEffect(() => {
-        if (open) {
-            setHeight(`${contentRef.current.scrollHeight}px`);
-        } else {
-            setHeight("0px");
-        }
-    }, [open]);
-
+export default function HistoryList({ data, loading }) {
     return (
-        <div 
-            className={`history-item ${open ? "open" : ""}`}
-            onClick={() => setOpen(!open)}
-        >
-            <div className="history-header">
-                <div className="history-item-time">
-                    {new Date(item.timestamp).toLocaleString()}
-                </div>
+        <div className="history-container">
+            <h3 className="history-title">История запросов</h3>
 
-                <div className="history-item-query">
-                    {item.query}
+            {data.length === 0 ? (
+                <p>История пока пуста</p>
+            ) : (
+                <div className="history-list">
+                    {data.map((item) => (
+                        <HistoryItem item={item} key={item.id} />
+                    ))}
                 </div>
-
-                <div className={`arrow ${open ? "rotated" : ""}`}>▸</div>
-            </div>
-
-            <div className="history-content-wrapper" style={{ maxHeight: height }}>
-                <div ref={contentRef} className="history-content">
-                    <div className="history-item-answer">
-                        {item.answer}
-                    </div>
-                </div>
-            </div>
+            )}
         </div>
     );
 }
