@@ -1,6 +1,6 @@
 import { CardGroup, Card } from 'react-bootstrap';
 import { Link } from 'react-router';
-import SearchBar from './methods/SearchBar';
+import SearchBar from './components/SearchBar';
 import { useState } from 'react';
 
 function Home() {

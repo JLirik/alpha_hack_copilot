@@ -1,6 +1,6 @@
 import { Form, InputGroup, Button, CardGroup, Card } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
-import fetcher from './Fetcher';
+import fetcher from '../methods/Fetcher';
 
 
 function SearchBar(apiEndpoint) {

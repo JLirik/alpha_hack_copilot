@@ -17,7 +17,7 @@ def get_context(prompt):
     return context
 
 
-def generate(prompt: str, city: str, business_info: str) -> str:
+def generate(prompt: str, city='Нет данных, игнорируй', business_info='Нет данных, игнорируй') -> str:
     context = get_context(prompt)
     user_prompt = prompt
     prompt = str(open('prompts/generation_prompt.txt', encoding="utf-8").read())

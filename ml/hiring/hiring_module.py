@@ -75,14 +75,15 @@ def generate_vacancy(_vacancy_info, _text, _city, _business_info):
         prompt = prompt.replace('vacancy', str(_vacancy_info)).replace('text', _text)
         prompt = prompt.replace('city', _city).replace('business_info', _business_info)
         response = ollama_client.chat(model=VACANCY_GENERATION_MODEL, messages=[{'role': 'user', 'content': prompt}])
-        if is_valid_json(response['message']['content']):
+        answer = response['message']['content'].replace('```json', '').replace('```', '')
+        if is_valid_json(answer) or '{' not in answer:
             break
         else:
-            print(f'{VACANCY_GENERATION_MODEL} дала невалидный json, переделываем')
-    return response['message']['content']
+            print(f'{VACANCY_GENERATION_MODEL} дала невалидный json, переделываем:\n{answer}')
+    return answer
 
 
-def generate(prompt: str, city: str, business_info: str):
+def generate(prompt: str, city='Нет данных, игнорируй', business_info='Нет данных, игнорируй'):
     _start_time = datetime.datetime.now()
     _vacancy_info = extract_vacancy_info(prompt)
     result = generate_vacancy(_vacancy_info, prompt, city, business_info)
@@ -96,5 +97,5 @@ if __name__ == '__main__':
     print('Извлечение основной информации из запроса...')
     vacancy_info = extract_vacancy_info(_prompt)
     print(f'Информация из запроса извлечена. Прошло: {datetime.datetime.now() - start_time}. Генерация текста вакансии...')
-    print(generate_vacancy(vacancy_info, _prompt))
+    print(generate_vacancy(vacancy_info, _prompt, 'Нет данных, игнорируй', 'Нет данных, игнорируй'))
     print(f'Готово! Ответ занял {datetime.datetime.now() - start_time}')

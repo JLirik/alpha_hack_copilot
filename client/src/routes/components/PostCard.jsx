@@ -4,14 +4,13 @@ import "./post.css";
 
 export default function PostCard({ title, body }) {
   return (
-    <div className="post-card">
-      <div className="post-header">
+    <div className="post-card alpha-card">
+      <div className="alpha-header">
+        <div className="alpha-icon">A</div>
         <h2>{title}</h2>
       </div>
 
-      <div className="post-body">
-        <MarkdownBlock text={body} />
-      </div>
+      <MarkdownBlock text={body} />
     </div>
   );
 }

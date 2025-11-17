@@ -22,11 +22,12 @@ def generate_answer(user_prompt, _city, _business_info, liked_post_text):
         prompt = prompt.replace('text', user_prompt)
         prompt = prompt.replace('city', _city).replace('business_info', _business_info)
         response = ollama_client.chat(model=GENERATION_MODEL, messages=[{'role': 'user', 'content': prompt}])
-        if is_valid_json(response['message']['content']) or '{' not in response['message']['content']:
+        answer = response['message']['content'].replace('```json', '').replace('```', '')
+        if is_valid_json(answer) or '{' not in answer:
             break
         else:
-            print(f'{GENERATION_MODEL} дала не валидный json, переделываем:\n\n{response['message']['content']}')
-    return response['message']['content']
+            print(f'{GENERATION_MODEL} дала не валидный json, переделываем:\n\n{answer}')
+    return answer
 
 
 def generate(prompt: str, _city='Нет данных, игнорируй', _business_info='Нет данных, игнорируй', liked_post_text=None):
