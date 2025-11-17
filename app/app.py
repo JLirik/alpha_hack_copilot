@@ -1,6 +1,8 @@
 import logging
+import os
 import time
 import uuid
+from datetime import timedelta
 
 from flask import Flask, request, jsonify
 
@@ -11,6 +13,9 @@ app = Flask(__name__)
 
 app.config["API_PREFIX"] = "/api/v1"
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "fallback-secret-key")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 3600)))
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(seconds=int(os.getenv("JWT_REFRESH_TOKEN_EXPIRES", 2592000)))
 
 from .utils.validation import validate_json_request, validate_file_request
 from .utils.handlers import handle_logic_request
