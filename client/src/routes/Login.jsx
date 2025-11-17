@@ -21,7 +21,7 @@ function Login() {
         const password = formData.get("password");
 
         try {
-            const response = await fetch('http://89.223.124.107:8081/api/v1/auth', {
+            const response = await fetch('/api/v1/auth', {
                 method: 'POST',
                 credentials: 'include',
                 headers: {

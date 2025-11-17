@@ -1,12 +1,33 @@
 import SearchBar from "./components/SearchBar"
 import { Card } from "react-bootstrap";
+
 function Hire() {
     const returnAnswer = () => {
-        if (localStorage.getItem("answer") && localStorage.getItem("answer").answerType == 'hire') {
-            const answer = localStorage.getItem("answer").answer;
-            return <Card><Card.Text>{answer}</Card.Text></Card>;
+        const stored = localStorage.getItem("answer");
+        if (!stored) return null;
+
+        let data;
+        try {
+            data = JSON.parse(stored);
+        } catch {
+            return null; 
         }
-    }
+
+        if (data.answerType !== "hire") return null;
+
+        const answer = data.answer;
+
+        if (typeof answer === "object") {
+            return Object.entries(answer).map(([key, item]) => (
+                <Card key={key}><Card.Header>{item.answerType}</Card.Header><Card.Text>{item.answer}</Card.Text></Card>
+            ));
+        }
+
+        return (
+            <Card><Card.Header>{data.answerType}</Card.Header><Card.Text>{answer}</Card.Text></Card>
+        );
+    };
+
     return (
         <>
             <h1>Найм</h1>

@@ -2,10 +2,8 @@ import { useEffect, useState } from 'react'
 import './App.css'
 import { useLocation } from 'react-router';
 import HistoryList from './routes/components/HistoryList';
-import { Form, InputGroup, Button, CardGroup, Card } from 'react-bootstrap';
-import { useNavigate } from 'react-router';
 import fetcher from './routes/methods/Fetcher';
-import { RegistrationError, AuthorizationError } from './routes/components/Errors';
+import { AuthorizationError } from './routes/components/Errors';
 
 function Footer() {
   const [history, setHistory] = useState(null);

@@ -2,7 +2,7 @@ import store from './store';
 import { setAccessToken } from "./authSlice";
 import { RegistrationError, AuthorizationError } from '../components/Errors';
 
-const API_ADDRESS = 'http://89.223.124.107:8081/api/v1/';
+const API_ADDRESS = '/api/v1/';
 
 export default async function fetcher(apiMethod, params = {}, method = 'POST') {
   let accessToken = store.getState().auth.accessToken;

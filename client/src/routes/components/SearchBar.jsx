@@ -1,4 +1,4 @@
-import { Form, InputGroup, Button, CardGroup, Card } from 'react-bootstrap';
+import { Form, InputGroup, Button } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import fetcher from '../methods/Fetcher';
 

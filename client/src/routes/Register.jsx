@@ -23,7 +23,7 @@ function Register() {
         try {
             event.preventDefault();
 
-            const response = await fetch('http://89.223.124.107:8081/api/v1/reg', {
+            const response = await fetch('/api/v1/reg', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
