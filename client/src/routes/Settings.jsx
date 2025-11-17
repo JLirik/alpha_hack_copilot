@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Container, Form, Button, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
 import { useNavigate } from 'react-router';
 import fetcher from './methods/Fetcher';
 import { AuthorizationError, RegistrationError } from './components/Errors';
@@ -7,6 +7,7 @@ import { AuthorizationError, RegistrationError } from './components/Errors';
 
 function Settings() {
     const [settings, setSettings] = useState();
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function loadSettings() {
@@ -32,16 +33,18 @@ function Settings() {
         const city = formData.get("city");
         const business = formData.get("business");
         const name = formData.get("name");
+        const curr_password = formData.get("curr_password");
 
         try {
             event.preventDefault();
 
             console.log(JSON.stringify({ username, password, city, name, business }));
 
-            const response = await fetcher('settings', 'GET');
+            const response = await fetcher('settings', { username, password, city, name, business, curr_password }, 'PATCH');
             if (response) {
                 const data = await response.json();
-                console.log(data);
+                store.dispatch(setAccessToken(data.accessToken));
+                navigate('/');
             }
         } catch (err) {
             console.error(err);
