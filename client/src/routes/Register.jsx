@@ -23,8 +23,6 @@ function Register() {
         try {
             event.preventDefault();
 
-            console.log(JSON.stringify({ username, password, city, name, business }));
-
             const response = await fetch('http://89.223.124.107:8081/api/v1/reg', {
                 method: 'POST',
                 headers: {

@@ -66,4 +66,4 @@ function Header({ themeHandle }) {
     );
 }
 
-export default Header
+export default Header;

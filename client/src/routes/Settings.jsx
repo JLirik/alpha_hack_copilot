@@ -14,7 +14,6 @@ function Settings() {
             try {
                 const response = await fetcher('settings', {}, 'GET');
                 if (response) {
-                    console.log(response);
                     setSettings(response);
                 }
             } catch (err) {
@@ -37,8 +36,6 @@ function Settings() {
 
         try {
             event.preventDefault();
-
-            console.log(JSON.stringify({ username, password, city, name, business }));
 
             const response = await fetcher('settings', { username, password, city, name, business, curr_password }, 'PATCH');
             if (response) {

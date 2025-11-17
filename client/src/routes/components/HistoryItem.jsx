@@ -1,11 +1,7 @@
-import React, { useState, useRef, useEffect } from "react";
 import { Accordion } from "react-bootstrap";
 import "./history.css";
 
 export default function HistoryItem({ item }) {
-    const contentRef = useRef(null);
-    console.log(item);
-
     return (
             <Accordion.Item eventKey={item.requestId}>
                 <Accordion.Header className="history-header">

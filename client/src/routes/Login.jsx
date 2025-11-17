@@ -29,10 +29,8 @@ function Login() {
                 },
                 body: JSON.stringify({ username, password })
             });
-            console.log(JSON.stringify({ username, password }));
             if (response.status === 200) {
                 const data = await response.json();
-                console.log(data)
                 const token = data.accessToken;
                 dispatch(setAccessToken(token));
                 navigate('/');

@@ -13,7 +13,6 @@ function MarketingIdeas() {
             try {
                 const response = await fetcher("query/marketing/regenerate", {"contentId": requestId}, 'POST');
                 if (response) {
-                    console.log(response);
                     setPosts(response);
                 }
             } catch (err) {

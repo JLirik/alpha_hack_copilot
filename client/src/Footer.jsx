@@ -41,7 +41,7 @@ function Footer() {
         setLoading(false);
       } catch (e) {
         if ((e) == AuthorizationError) {
-          console.log();
+          
         }
       }
     }
