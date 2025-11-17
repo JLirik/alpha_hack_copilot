@@ -11,6 +11,7 @@ function Login() {
     const [errorMessage, setErrorMessage] = useState(null);
 
     const [theme, setTheme] = useState(localStorage.getItem('theme'));
+    document.querySelector("body").setAttribute("data-bs-theme", theme);
 
     const sentAuth = async (event) => {
         event.preventDefault();
@@ -28,7 +29,7 @@ function Login() {
                 },
                 body: JSON.stringify({ username, password })
             });
-
+            console.log(JSON.stringify({ username, password }));
             if (response.status === 200) {
                 const data = await response.json();
                 console.log(data)
