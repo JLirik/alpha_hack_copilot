@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     login VARCHAR(40) UNIQUE NOT NULL,
-    password VARCHAR(40) UNIQUE NOT NULL,
+    password VARCHAR(40),
     city VARCHAR(40) NOT NULL,
     name TEXT NOT NULL,
     business_about TEXT
@@ -15,6 +15,7 @@ CREATE TABLE requests_story (
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     prompt_in TEXT NOT NULL,
     answer_out TEXT NOT NULL,
+    category VARCHAR(20),
     request_time TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 

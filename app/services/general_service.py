@@ -11,7 +11,7 @@ class GeneralService:
         city, business_info = get_user_info(user_id)
         prompt_answer = general_module.generate(query.query, city, business_info)
 
-        insert_request(user_id, query.query, prompt_answer)
+        insert_request(user_id, query.query, prompt_answer, 'other')
 
         return {
             "prompt": query.query,

@@ -11,7 +11,7 @@ class FinanceService:
         city, business_info = get_user_info(user_id)
         prompt_answer = finance_module.generate(query.query, city, business_info)
 
-        insert_request(user_id, query.query, prompt_answer)
+        insert_request(user_id, query.query, prompt_answer, 'finance')
 
         return {
             "prompt": query.query,

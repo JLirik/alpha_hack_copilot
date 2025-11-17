@@ -12,10 +12,10 @@ class JurisdictionService:
         prompt_answer = law_module.generate(query.query, city,
                                                 business_info)
 
-        insert_request(user_id, query.query, prompt_answer)
+        insert_request(user_id, query.query, prompt_answer, 'law')
 
         return {
             "prompt": query.query,
             "answer": prompt_answer,
-            "answerType": "finance",
+            "answerType": "law",
         }

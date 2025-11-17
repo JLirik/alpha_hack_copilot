@@ -88,26 +88,6 @@ def explain_legal_text():
     return handle_logic_request(JurisdictionService.explain_text, query, "Explaining legal text")
 
 
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/createOffer', methods=['POST'])
-def create_offer():
-    """Генерация предложения о работе"""
-
-    validation_error, query = validate_json_request(HireCreateOfferQuery)
-    if validation_error:
-        return validation_error
-    return handle_logic_request(HireService.create_offer, query, "Creating offer")
-
-
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/postOffer', methods=['POST'])
-def post_offer():
-    """Публикация вакансии"""
-
-    validation_error, query = validate_json_request(HirePostOfferQuery)
-    if validation_error:
-        return validation_error
-    return handle_logic_request(HireService.post_offer, query, "Posting offer")
-
-
 @app.route(f'{app.config["API_PREFIX"]}/query/hire', methods=['POST'])
 def process_hire_question():
     """Обработка вопроса по найму"""
@@ -221,8 +201,6 @@ def history(amount):
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/generate', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/regenerate', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/law/explain', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/createOffer', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
-@app.route(f'{app.config["API_PREFIX"]}/query/hire/postOffer', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/hire', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/finance', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/general', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
