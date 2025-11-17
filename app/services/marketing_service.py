@@ -26,7 +26,7 @@ class MarketingService:
     @staticmethod
     def regenerate_content(query: MarketingRegenerateQuery) -> dict:
         city, business_info = get_user_info(request.user["user_id"])
-        last_query = get_request(query.contentId)[0]
+        last_query = get_request(query.contentId)
         prompt_answer = marketing_module.generate(last_query[0], city,
                                                   business_info, last_query[1])
 

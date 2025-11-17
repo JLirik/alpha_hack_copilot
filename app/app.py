@@ -4,7 +4,7 @@ import time
 import uuid
 from datetime import timedelta
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -245,3 +245,7 @@ def method_not_allowed():
     """Обработчик неподдерживаемых методов"""
 
     return APIResponse.error(f"Method {request.method} not allowed for this endpoint", request.request_id)
+
+@app.route('/')
+def main():
+    return render_template('index.html')

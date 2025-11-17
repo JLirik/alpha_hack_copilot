@@ -3,6 +3,7 @@ import os
 import psycopg2
 import psycopg2.errors
 from dotenv import load_dotenv
+from utils.security import hash_password, verify_password
 
 load_dotenv()
 
@@ -28,10 +29,12 @@ def register_user(login, password, name, city, info):
         if existing_user:
             return 409
 
+        hashed_password = hash_password(password)
+
         cur.execute(
             """INSERT INTO users (login, password, city, name, business_about)
             VALUES (%s, %s, %s, %s, %s) RETURNING id
-        """, (login, password, city, name, info))
+        """, (login, hashed_password, city, name, info))
 
         conn.commit()
         return cur.fetchone()[0]
@@ -52,31 +55,22 @@ def get_user_info_by_login(login):
         conn.rollback()
         return e
 
+
 def login_user(login, password):
     try:
         cur = conn.cursor()
-
-        cur.execute(
-            """SELECT id FROM users WHERE login = %s""",
-            login
-        )
-
+        cur.execute("SELECT id, password FROM users WHERE login = %s", (login,))
         existing_user = cur.fetchone()
-        if existing_user:
-            return 404  # Not exist
+        if not existing_user:
+            return 404
 
-        cur.execute(
-            """SELECT id FROM users WHERE login = %s AND password = %s""",
-            (login, password)
-        )
-
-        if not cur.fetchone():
-            return 401  # Wrong password
+        user_id, stored_password = existing_user  # Теперь правильно
+        if not verify_password(password, stored_password):
+            return 401
+        return 0
     except Exception as e:
         conn.rollback()
-        return e
-
-    return 0
+        return 500
 
 
 def get_uuid_by_login(login):
@@ -105,17 +99,60 @@ def get_user_info(uuid):
         return e
 
 
-def update_user_information(name, city, info, uuid):
+def update_user_information(new_login, new_name, new_city, new_business, uuid, current_password=None,
+                            new_password=None):
     try:
-        cur = conn.cursor()
-        cur.execute(
-            """UPDATE users SET name = %s, city = %s, business_about = %s WHERE id = %s
-        """, (name, city, info, uuid))
-        conn.commit()
+        with conn.cursor() as cur:
+            if new_login:
+                cur.execute(
+                    """SELECT id FROM users WHERE login = %s AND id != %s""",
+                    (new_login, uuid)
+                )
+                if cur.fetchone():
+                    return 409  # Login already taken
+
+            if new_password:
+                if not current_password:
+                    return 400  # Current password required
+
+                cur.execute(
+                    """SELECT password FROM users WHERE id = %s""",
+                    (uuid,)
+                )
+                result = cur.fetchone()
+                if not result:
+                    return 404
+
+                stored_password = result[0]
+                if not verify_password(current_password, stored_password):
+                    return 401  # Current password incorrect
+
+                hashed_new_password = hash_password(new_password)
+
+                cur.execute(
+                    """UPDATE users SET login = COALESCE(%s, login), 
+                                       name = COALESCE(%s, name), 
+                                       city = COALESCE(%s, city), 
+                                       business_about = COALESCE(%s, business_about), 
+                                       password = %s 
+                       WHERE id = %s""",
+                    (new_login, new_name, new_city, new_business, hashed_new_password, uuid)
+                )
+            else:
+                cur.execute(
+                    """UPDATE users SET login = COALESCE(%s, login), 
+                                       name = COALESCE(%s, name), 
+                                       city = COALESCE(%s, city), 
+                                       business_about = COALESCE(%s, business_about) 
+                       WHERE id = %s""",
+                    (new_login, new_name, new_city, new_business, uuid)
+                )
+
+            conn.commit()
+            return 0
     except Exception as e:
         conn.rollback()
-        return e
-    return 0
+        return 500
 
 
 def save_vectors(chunks, vectors, category):

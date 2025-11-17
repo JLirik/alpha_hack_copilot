@@ -17,7 +17,7 @@ class JurisdictionService:
         insert_request(request.user["user_id"], query.clause, prompt_answer, 'law')
 
         return {
-            "prompt": query.query,
+            "prompt": query.clause,
             "answer": prompt_answer,
             "answerType": "law",
         }

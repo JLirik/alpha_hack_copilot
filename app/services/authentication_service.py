@@ -47,7 +47,7 @@ class AuthenticationService:
         access_token = JWTUtils.create_access_token({
             "user_id": user_id,
             "username": user_data[0],
-            "business": user_data[4],
+            "business": user_data[3],
             "city": user_data[1],
             "name": user_data[2]
         })
