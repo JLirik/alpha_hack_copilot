@@ -1,7 +1,22 @@
-# Установите Ollama
+# Развертывание базы данных
+1. Установите [PostgreSQL](https://www.postgresql.org/) локально
+2. Установите расширение [pgvector](https://github.com/pgvector/pgvector)
+3. Установите dotenv:
+    `pip install python-dotenv`.
+4. Создайте файл `.env` в соответствии с `.env.example`.
+   Заполните своими значениями. Файл `.env` локален на вашем компьютере.
+5. Для создания БД запустите файл
+   `db\scripts\init_db.py`.
+7. Создайте базу знаний. Для этого запустите файлы `ml\learning\knowledge_base.py` и `ml\learning\codes_base.py`.
+Все функции размещены в файле `db\scripts\operations_db.py`.
+В случае неполадок БД можно удалить `db\scripts\delete_db.py`.
+
+
+# Установка Ollama
 [Скачайте](https://ollama.com/) и установите ollama с официального сайта.
 Установите следующие модели:
  - gemma3:4b
  - deepseek-r1:8b
  - qwen3:4b
+
 
