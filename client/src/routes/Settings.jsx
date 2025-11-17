@@ -60,13 +60,13 @@ function Settings() {
             <h1>Настройки</h1>
             <Form onSubmit={updateSettings}>
                 <Form.Group className="mb-3">
-                    <Form.Control type="login" defaultValue={settings.username} name='login' required placeholder="Имя пользователя" />
+                    <Form.Control type="login" defaultValue={settings.username} name='login'  placeholder="Имя пользователя" />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                    <Form.Control type='password' name='password' required placeholder="Новый пароль (если хотите поменять)" />
+                    <Form.Control type='password' name='password'  placeholder="Новый пароль (если хотите поменять)" />
                 </Form.Group>
                 <Form.Group className="mb-3">
-                    <Form.Control defaultValue={settings.name} name='name' required placeholder="Фамилия Имя Отчество" />
+                    <Form.Control defaultValue={settings.name} name='name'  placeholder="Фамилия Имя Отчество" />
                 </Form.Group>
                 <Form.Group className="mb-3">
                     <Form.Control defaultValue={settings.city} name='city' placeholder="Город работы" />

@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { fetchHistory } from "./historyApi";
+import { Accordion } from "react-bootstrap";
 import HistoryItem from "./HistoryItem";
 import "./history.css";
 
-export default function HistoryList({ data, loading }) {
+export default function HistoryList({ data }) {
     return (
         <div className="history-container">
             <h3 className="history-title">История запросов</h3>
@@ -11,11 +10,11 @@ export default function HistoryList({ data, loading }) {
             {data.length === 0 ? (
                 <p>История пока пуста</p>
             ) : (
-                <div className="history-list">
+                <Accordion className="history-list">
                     {data.map((item) => (
                         <HistoryItem item={item} key={item.id} />
                     ))}
-                </div>
+                </Accordion>
             )}
         </div>
     );

@@ -15,6 +15,7 @@ import Marketing from './routes/Marketing.jsx'
 import Hire from './routes/Hire.jsx'
 import Law from './routes/Law.jsx';
 import Finance from './routes/Finance.jsx';
+import MarketingIdeas from './routes/MarketingIdeas.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -25,6 +26,7 @@ createRoot(document.getElementById('root')).render(
             <Route index element={<Home />}></Route>
             <Route path='settings' element={<Settings />}></Route>
             <Route path='marketing' element={<Marketing />}></Route>
+            <Route path='marketing/:requestId' element={<MarketingIdeas />}></Route>
             <Route path='hire' element={<Hire />}></Route>
             <Route path='law' element={<Law />}></Route>
             <Route path='finance' element={<Finance />}></Route>

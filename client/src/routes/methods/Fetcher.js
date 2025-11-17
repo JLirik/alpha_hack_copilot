@@ -6,7 +6,6 @@ const API_ADDRESS = 'http://127.0.0.1:4010/api/v1/';
 
 export default async function fetcher(apiMethod, params = {}, method = 'POST') {
   let accessToken = store.getState().auth.accessToken;
-  console.log(accessToken);
 
   const callApi = async (token) => {
     let apiDict = {

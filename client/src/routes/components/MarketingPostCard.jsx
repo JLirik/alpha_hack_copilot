@@ -1,8 +1,10 @@
-import React from "react";
 import MarkdownBlock from "./MarkdownBlock";
 import "./post.css";
+import { useNavigate } from 'react-router';
 
-export default function MarketingPostCard({ styleType, body }) {
+
+export default function MarketingPostCard({ styleType, body, requestId }) {
+  let navigate = useNavigate();
   const classMap = {
     standard: "mkt-standard",
     creative: "mkt-creative",
@@ -10,7 +12,7 @@ export default function MarketingPostCard({ styleType, body }) {
   };
 
   return (
-    <div className={`post-card marketing ${classMap[styleType]}`}>
+    <div className={`post-card marketing ${classMap[styleType]}`} onClick={() => navigate("/marketing/" + requestId)}>
       <div className="alpha-header">
         <div className="alpha-icon red">A</div>
         <h2>Маркетинг • {styleType}</h2>

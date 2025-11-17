@@ -1,5 +1,5 @@
 import './App.css'
-import { Col, Container, Form, Nav, Navbar, NavDropdown, Row, Button, ToggleButton } from 'react-bootstrap';
+import { Col, Container, Form, Navbar, Row, Button, ToggleButton } from 'react-bootstrap';
 
 function Header({ themeHandle }) {
     const handleChange = (event) => {
@@ -49,7 +49,7 @@ function Header({ themeHandle }) {
                             <Col xs="auto">
                                 <ToggleButton id='toggle-check'
                                 type="checkbox"
-                                variant="outline-danger"
+                                variant="outline-secondary"
                                     onChange={handleChange}
                                     className="d-inline-block align-top"
                                     checked={localStorage.getItem("theme") == "dark"}
