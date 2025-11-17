@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -74,7 +76,9 @@ class RegRequest(BaseModel):
 
 class UpdateSettingsRequest(BaseModel):
     """Модель запроса для обновления настроек пользователя"""
-    username: str
-    password: str
-    business: str
-    city: str
+    username: Optional[str] = None
+    password: Optional[str] = None
+    current_password: Optional[str] = None
+    business: Optional[str] = None
+    city: Optional[str] = None
+    name: Optional[str] = None
