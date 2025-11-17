@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -36,12 +38,6 @@ class AuthRequest(BaseModel):
     """Модель запроса для аутентификации пользователя"""
     username: str
     password: str
-
-
-class RefreshRequest(BaseModel):
-    """Модель запроса для обновления JWT-токена"""
-    username: str
-    refreshToken: str
 
 
 class RegRequest(BaseModel):

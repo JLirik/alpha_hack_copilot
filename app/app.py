@@ -13,12 +13,19 @@ app = Flask(__name__)
 
 app.config["API_PREFIX"] = "/api/v1"
 app.config["MAX_CONTENT_LENGTH"] = 16 * 1024 * 1024  # 16MB
-app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "fallback-secret-key")
-app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(seconds=int(os.getenv("JWT_ACCESS_TOKEN_EXPIRES", 3600)))
-app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(seconds=int(os.getenv("JWT_REFRESH_TOKEN_EXPIRES", 2592000)))
+app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
+app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(minutes=15)
+app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=7)
 
-from .utils.validation import validate_json_request, validate_file_request
+app.config["JWT_REFRESH_COOKIE_NAME"] = "refresh_token"
+app.config["JWT_REFRESH_COOKIE_HTTPONLY"] = True
+app.config["JWT_REFRESH_COOKIE_SECURE"] = True
+app.config["JWT_REFRESH_COOKIE_SAMESITE"] = "Strict"
+app.config["JWT_REFRESH_COOKIE_PATH"] = "/api/v1/refresh"
+
+from .utils.validation import validate_json_request
 from .utils.handlers import handle_logic_request
+from .utils.auth_middleware import token_required
 from .models.requests import *
 from .models.responses import APIResponse
 from .services.authentication_service import AuthenticationService
@@ -64,6 +71,7 @@ def after_request(response):
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/generate', methods=['POST'])
+@token_required
 def generate_marketing_content():
     """Генерация маркетингового контента"""
 
@@ -74,6 +82,7 @@ def generate_marketing_content():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/marketing/regenerate', methods=['POST'])
+@token_required
 def regenerate_marketing_content():
     """Перегенерация маркетингового контента"""
 
@@ -84,6 +93,7 @@ def regenerate_marketing_content():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/law/explain', methods=['POST'])
+@token_required
 def explain_legal_text():
     """Объяснение юридического пункта или текста"""
 
@@ -94,6 +104,7 @@ def explain_legal_text():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/hire', methods=['POST'])
+@token_required
 def process_hire_question():
     """Обработка вопроса по найму"""
 
@@ -104,6 +115,7 @@ def process_hire_question():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/finance', methods=['POST'])
+@token_required
 def process_finance_question():
     """Обработка финансового вопроса"""
 
@@ -114,6 +126,7 @@ def process_finance_question():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/query/general', methods=['POST'])
+@token_required
 def process_general_question():
     """Обработка общего вопроса"""
 
@@ -131,21 +144,18 @@ def auth():
     if validation_error:
         return validation_error
     try:
-        return AuthenticationService.auth(query, request.request_id)
+        return AuthenticationService.auth(query)
     except Exception as e:
         logger.error(f"Authentication failed for request {request.request_id}: {str(e)}", exc_info=True)
         return APIResponse.error(f"Internal server error during authentication", request.request_id)
 
 
-@app.route(f'{app.config["API_PREFIX"]}/refresh', methods=['POST'])
+@app.route(f'{app.config["API_PREFIX"]}/refresh', methods=['GET'])
 def refresh():
     """Обновление JWT-токена"""
 
-    validation_error, query = validate_json_request(RefreshRequest)
-    if validation_error:
-        return validation_error
     try:
-        return AuthenticationService.refresh(query)
+        return AuthenticationService.refresh()
     except Exception as e:
         logger.error(f"Refresh failed for request {request.request_id}: {str(e)}", exc_info=True)
         return APIResponse.error(f"Internal server error during refresh", request.request_id)
@@ -165,7 +175,20 @@ def reg():
         return APIResponse.error(f"Internal server error during reg", request.request_id)
 
 
+@app.route(f'{app.config["API_PREFIX"]}/logout', methods=['GET'])
+@token_required
+def logout():
+    """Выход пользователя"""
+
+    try:
+        return AuthenticationService.logout()
+    except Exception as e:
+        logger.error(f"Logout failed for request {request.request_id}: {str(e)}", exc_info=True)
+        return APIResponse.error(f"Internal server error during logout", request.request_id)
+
+
 @app.route(f'{app.config["API_PREFIX"]}/settings', methods=['GET'])
+@token_required
 def get_settings():
     """Получение настроек пользователя"""
 
@@ -177,6 +200,7 @@ def get_settings():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/settings', methods=['PATCH'])
+@token_required
 def update_settings():
     """Обновление настроек пользователя"""
 
@@ -191,13 +215,14 @@ def update_settings():
 
 
 @app.route(f'{app.config["API_PREFIX"]}/history/<int:amount>', methods=['GET'])
+@token_required
 def history(amount):
     """Получение истории запросов пользователя"""
 
-    if amount < 1:
-        return APIResponse.error("Amount must be >= 1", request.request_id)
+    if amount < 1 or amount > 50:
+        return APIResponse.error("Amount must be >= 1 and <= 50", request.request_id)
     try:
-        return jsonify(SettingsService.get_history(amount, request.request_id)), 200
+        return jsonify(SettingsService.get_history(amount)), 200
     except Exception as e:
         logger.error(f"Getting history failed for request {request.request_id}: {str(e)}", exc_info=True)
         return APIResponse.error(f"Internal server error during getting history", request.request_id)
@@ -210,10 +235,12 @@ def history(amount):
 @app.route(f'{app.config["API_PREFIX"]}/query/finance', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/query/general', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/auth', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
-@app.route(f'{app.config["API_PREFIX"]}/refresh', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+@app.route(f'{app.config["API_PREFIX"]}/refresh', methods=['POST', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/reg', methods=['GET', 'PUT', 'DELETE', 'PATCH'])
+@app.route(f'{app.config["API_PREFIX"]}/logout', methods=['POST', 'PUT', 'DELETE', 'PATCH'])
 @app.route(f'{app.config["API_PREFIX"]}/settings', methods=['POST', 'PUT', 'DELETE'])
 @app.route(f'{app.config["API_PREFIX"]}/history/<int:amount>', methods=['POST', 'PUT', 'DELETE', 'PATCH'])
+@token_required
 def method_not_allowed():
     """Обработчик неподдерживаемых методов"""
 

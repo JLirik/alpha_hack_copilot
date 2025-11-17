@@ -1,7 +1,8 @@
 import os
-from dotenv import load_dotenv
+
 import psycopg2
 import psycopg2.errors
+from dotenv import load_dotenv
 
 load_dotenv()
 
@@ -29,15 +30,27 @@ def register_user(login, password, name, city, info):
 
         cur.execute(
             """INSERT INTO users (login, password, city, name, business_about)
-            VALUES (%s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s) RETURNING id
         """, (login, password, city, name, info))
 
         conn.commit()
+        return cur.fetchone()[0]
     except Exception as e:
         conn.rollback()
         return e
-    return 0
 
+
+def get_user_info_by_login(login):
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            """SELECT id, city, name, business_about FROM users WHERE login = %s
+        """, (login,))
+
+        return cur.fetchone()
+    except Exception as e:
+        conn.rollback()
+        return e
 
 def login_user(login, password):
     try:
