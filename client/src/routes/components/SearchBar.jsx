@@ -8,8 +8,7 @@ function SearchBar(apiEndpoint) {
 
   const sendQuery = (formData) => {
     if (!formData.get("question")) return;
-    const accessToken = "MYTOKEN";
-    fetcher(apiEndpoint, accessToken, { "query": formData.get("question") }).catch((e) => navigate("/reg")).then(data => {
+    fetcher(apiEndpoint, { "query": formData.get("question") }).catch((e) => navigate("/reg")).then(data => {
         if (data) {
           localStorage.setItem("answer", data);
           navigate(data.answerType != "other" ? "/" + data.answerType : "/");

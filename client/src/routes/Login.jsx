@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Container, Form, Button } from 'react-bootstrap';
 import Header from "../Header";
 import { useNavigate } from 'react-router';
+import { useDispatch } from 'react-redux';
+import { setAccessToken } from './methods/authSlice';
 
 function Login() {
     let navigate = useNavigate();
+    let dispatch = useDispatch();
 
     const sentAuth = (formData) => {
         token = fetch('http://127.0.0.1:4010/api/v1/refresh', {
@@ -20,8 +23,8 @@ function Login() {
                 else return null;
             })
         if (!token) throw Error.Authorization;
-        
-        return token;
+        dispatch(setAccessToken(token));
+        navigate('/');
     }
     const [theme, setTheme] = useState(localStorage.getItem('theme'));
     return (
