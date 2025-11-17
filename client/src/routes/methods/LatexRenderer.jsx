@@ -1,46 +1,48 @@
-import { useEffect, useRef } from 'react';
+import { useMemo } from 'react';
+import ReactMarkdown from 'react-markdown';
+import rehypeRaw from 'rehype-raw';
 import katex from 'katex';
 import 'katex/dist/katex.min.css';
 
-const renderBlock = (latex, container, displayMode = true) => {
-    try {
-        katex.render(latex, container, {
-            throwOnError: false,
-            displayMode: displayMode,
-        });
-    } catch (err) {
-        container.innerHTML = `<span style="color:red;">${err.message}</span>`;
-    }
-};
-
-export default function LatexRenderer({latex, displayMode = true}) {
-    const containerRef = useRef();
-
-    useEffect(() => {
-        if (containerRef.current && latex) {
-            const blocks = latex
-                .split(/\n\s*\n/) // split on empty lines (paragraph breaks)
-                .map((b) => b.trim())
-                .filter((b) => b);
-
-            containerRef.current.innerHTML = ''; // clear previous
-
-            blocks.forEach((block) => {
-                const el = document.createElement('div');
-                containerRef.current.appendChild(el);
-                const isMathBlock =
-                    block.startsWith('\\[') ||
-                    block.startsWith('\\(') ||
-                    block.startsWith('\\begin') ||
-                    block.includes('&=') ||
-                    block.includes('^') ||
-                    displayMode;
-
-                const cleanBlock = block.replace(/^\\\[|\\\]$/g, '').replaceAll('*', '');
-                renderBlock(cleanBlock, el, isMathBlock);
-            });
+export default function LatexRenderer({ content }) {
+    const parsedContent = useMemo(() => {
+        if (!content) {
+            return '';
         }
-    }, [latex, displayMode]);
 
-    return <div ref={containerRef} />;
+        let processedText = content;
+
+        const renderKatex = (formula, displayMode) => {
+            try {
+                return katex.renderToString(formula, {
+                    displayMode: displayMode,
+                    throwOnError: false,
+                    output: 'html',
+                });
+            } catch (error) {
+                console.error('KaTeX rendering error:', error);
+                return `<span>${formula}</span>`;
+            }
+        };
+
+        processedText = processedText.replace(/\$\$(.*?)\$\$/gs, (match, formula) => {
+            return renderKatex(formula, true);
+        });
+
+        processedText = processedText.replace(/\$(.*?)\$/g, (match, formula) => {
+            // Avoid matching $$...$$ again
+            if (match.startsWith('$$') && match.endsWith('$$')) {
+                return match;
+            }
+            return renderKatex(formula, false);
+        });
+
+        return processedText;
+
+    }, [content]);
+    return (
+        <ReactMarkdown rehypePlugins={[rehypeRaw]}>
+            {parsedContent}
+        </ReactMarkdown>
+    );
 };
